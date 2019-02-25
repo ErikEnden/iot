@@ -18,6 +18,7 @@ app.get('/light-level', function(request, response){
 
 app.post('/update-level', function(request, response){
     curLux = request.body.luxlevel
+    console.log(request.body.luxlevel)
     response.send('wow u did it congrats nice job')
 })
 

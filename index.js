@@ -29,7 +29,11 @@ app.get('/light-level', function (request, response) {
 app.get('/light-level-hist', function (request, response) {
   db.many('SELECT * FROM ' + process.env.TABLE_NAME)
     .then(function (res) {
+      console.log(res)
       response.sendStatus(res)
+    })
+    .catch(function (error) {
+      console.log(error)
     })
 })
 

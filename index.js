@@ -18,23 +18,19 @@ let curLux = 0
 app.use(bodyParser.urlencoded({ extended: false }))
 
 app.get('/', function (request, response) {
-  response.send('hi')
+  response.sendStatus('hi')
 })
 
 app.get('/light-level', function (request, response) {
   let luxString = curLux.toString()
-  response.send(luxString)
+  response.sendStatus(luxString)
 })
 
 app.get('/light-level-hist', function (request, response) {
   db.many('SELECT * FROM ' + process.env.TABLE_NAME)
     .then(function (res) {
-      response.send(res)
+      response.sendStatus(res)
     })
-})
-
-app.get('/current-mode', function (request, response) {
-  response.send(mode)
 })
 
 app.post('/update-level', function (request, response) {
@@ -48,7 +44,7 @@ app.post('/update-level', function (request, response) {
   }).then(function (response) {
     console.log(response)
   })
-  response.send(200)
+  response.sendStatus(200)
 })
 
 app.listen(port, () => console.log('App listening on ' + port))

@@ -14,7 +14,7 @@ const db = pgp('postgres://' +
     process.env.DB_PORT + '/' + 
     process.env.DB_NAME
 )
-const modes = ['none', 'red', 'green', 'blue']
+const modes = ['none', 'red', 'blue']
 let curLux = 0
 let mode = 'none'
 
@@ -43,9 +43,11 @@ app.get('/current-mode', function(request, response){
 app.post('/update-level', function(request, response){
     console.log(request.body)
     curLux = request.body.luxlevel
+    sensMode = request.body.sensormode
     console.log(request.body.luxlevel)
-    db.none('INSERT INTO "' + process.env.TABLE_NAME + '"(sensor_reading) VALUES(${luxLevel})', {
-      luxLevel: curLux
+    db.none('INSERT INTO "' + process.env.TABLE_NAME + '"(sensor_reading, sensor_filter_mode) VALUES(${luxLevel}, ${sensorMode})', {
+      luxLevel: curLux,
+      sensorMode: sensormode
     }) 
     response.send(200)
 })

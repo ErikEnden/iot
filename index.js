@@ -47,7 +47,7 @@ app.post('/update-level', function(request, response){
     console.log(request.body.luxlevel)
     db.none('INSERT INTO "' + process.env.TABLE_NAME + '"(sensor_reading, sensor_filter_mode) VALUES(${luxLevel}, ${sensorMode})', {
       luxLevel: curLux,
-      sensorMode: sensormode
+      sensorMode: sensMode
     }) 
     response.send(200)
 })

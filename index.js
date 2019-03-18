@@ -47,6 +47,8 @@ app.post('/update-level', function (request, response) {
     sensorMode: sensMode
   }).then(function (response) {
     console.log(response)
+  }).catch(function (error) {
+    console.log(error)
   })
   response.sendStatus(200)
 })

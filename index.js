@@ -32,7 +32,7 @@ app.get('/light-level-hist', function (request, response) {
   db.many('SELECT * FROM ' + process.env.TABLE_NAME)
     .then(function (res) {
       console.log(res)
-      response.sendStatus(res)
+      response.send(res)
     })
     .catch(function (error) {
       console.log(error)
@@ -43,10 +43,12 @@ app.post('/update-level', function (request, response) {
   console.log(request.body)
   curLux = request.body.luxlevel
   let sensMode = request.body.sensormode
+  let measurementId = request.body.measurement
   console.log(request.body.luxlevel)
-  db.none('INSERT INTO "' + process.env.TABLE_NAME + '"(sensor_reading, sensor_filter_mode, measurement_id) VALUES(${luxLevel}, ${sensorMode}, ${measurement})', {
+  db.none('INSERT INTO "' + process.env.TABLE_NAME + '"(sensor_reading, sensor_filter_mode, measurement_id) VALUES (${luxLevel}, ${sensorMode}, ${measurement})', {
     luxLevel: curLux,
-    sensorMode: sensMode
+    sensorMode: sensMode,
+    measurement: measurementId
   }).then(function (response) {
     console.log(response)
   }).catch(function (error) {

@@ -1,6 +1,7 @@
 require('dotenv').config()
 
 const express = require('express')
+const cors = require('cors')
 const bodyParser = require('body-parser')
 const pgp = require('pg-promise')()
 const app = express()
@@ -16,7 +17,7 @@ const db = pgp('postgres://' +
 let curLux = 0
 
 app.use(bodyParser.urlencoded({ extended: false }))
-
+app.use(cors())
 app.get('/', function (request, response) {
   response.sendStatus('200')
   response.send('hello')

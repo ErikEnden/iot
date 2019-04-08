@@ -1,5 +1,5 @@
 {
-  "name": "asid",
+  "name": "valgussensor_api",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -15,5 +15,8 @@
     "eslint-plugin-node": "^8.0.1",
     "eslint-plugin-promise": "^4.0.1",
     "eslint-plugin-standard": "^4.0.0"
+  },
+  "dependencies": {
+    "cors": "^2.8.5"
   }
 }

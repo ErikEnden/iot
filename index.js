@@ -18,12 +18,14 @@ let curLux = 0
 app.use(bodyParser.urlencoded({ extended: false }))
 
 app.get('/', function (request, response) {
-  response.sendStatus('hi')
+  response.sendStatus('200')
+  response.send('hello')
 })
 
 app.get('/light-level', function (request, response) {
   let luxString = curLux.toString()
-  response.sendStatus(luxString)
+  response.send(luxString)
+  response.sendStatus(200)
 })
 
 app.get('/light-level-hist', function (request, response) {

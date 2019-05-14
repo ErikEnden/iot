@@ -30,21 +30,35 @@ app.get('/light-level', function (request, response) {
 })
 
 app.get('/light-level-hist', function (request, response) {
-  db.many('SELECT * FROM ' + process.env.TABLE_NAME + ' ORDER BY time DESC LIMIT 303')
-    .then(function (res) {
-      console.log(res)
+  if (!request.query.page && !request.query.perPage) {
+    db.many('SELECT * FROM ' + process.env.TABLE_NAME + ' ORDER BY time DESC LIMIT 303')
+      .then(function (res) {
+        response.send(res)
+      })
+      .catch(function (error) {
+        console.log(error)
+      })
+  } else {
+    let perPage = 303
+    if (request.query.perPage) {
+      perPage = request.query.perPage
+    }
+    let queryString = 'SELECT * FROM ' + process.env.TABLE_NAME + ' ORDER BY time DESC LIMIT ' + perPage
+    if (request.query.page) {
+      queryString = queryString + ' OFFSET ' + (perPage * request.query.page + 1)
+    }
+    db.many(queryString).then(function (res) {
       response.send(res)
-    })
-    .catch(function (error) {
+    }).catch(function (error) {
       console.log(error)
     })
+  }
 })
 
 app.get('/light-level-hist/:page.:perPage', function (request, response) {
-  console.log(request.params)
+  console.log(request.query)
   db.many('SELECT * FROM ' + process.env.TABLE_NAME + ' LIMIT ' + request.params.perPage + ' OFFSET ' + ((request.params.perPage * request.params.page) + 1) + ' ORDER BY time ASC')
     .then(function (res) {
-      console.log(res)
       response.send(res)
     })
     .catch(function (error) {

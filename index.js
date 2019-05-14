@@ -30,7 +30,7 @@ app.get('/light-level', function (request, response) {
 })
 
 app.get('/light-level-hist', function (request, response) {
-  db.many('SELECT * FROM ' + process.env.TABLE_NAME + ' ORDER BY time DESC LIMIT 100')
+  db.many('SELECT * FROM ' + process.env.TABLE_NAME + ' ORDER BY time DESC LIMIT 303')
     .then(function (res) {
       console.log(res)
       response.send(res)
@@ -42,7 +42,7 @@ app.get('/light-level-hist', function (request, response) {
 
 app.get('/light-level-hist/:page.:perPage', function (request, response) {
   console.log(request.params)
-  db.many('SELECT * FROM ' + process.env.TABLE_NAME + ' LIMIT ' + request.params.perPage + ' OFFSET ' + ((request.params.perPage * request.params.page) + 1) ' ORDER BY time ASC')
+  db.many('SELECT * FROM ' + process.env.TABLE_NAME + ' LIMIT ' + request.params.perPage + ' OFFSET ' + ((request.params.perPage * request.params.page) + 1) + ' ORDER BY time ASC')
     .then(function (res) {
       console.log(res)
       response.send(res)

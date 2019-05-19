@@ -43,16 +43,38 @@ app.get('/light-level-hist', function (request, response) {
     let perPage = 303
     let startDate = '1970-01-01 00:00:00+00'
     let endDate = moment().format('YYYY-MM-DD HH:mm:ss+00')
+    let queryString = 'SELECT * FROM ' + process.env.TABLE_NAME
     if (request.query.perPage) {
       perPage = request.query.perPage
     }
-    if (request.query.startDate) {
-      startDate = request.query.startDate
+    if (request.query.startDate || request.query.endDate) {
+      queryString += ' WHERE '
+      if (request.query.startDate) {
+        startDate = request.query.startDate
+        if (request.query.startTime) {
+          startDate = startDate + ' ' + request.query.startTime + '+03'
+        }
+        queryString += 'time > ' + "'" + startDate + "'"
+        if (request.query.endDate) {
+          queryString += ' AND '
+          endDate = request.query.endDate
+          if (request.query.endTime) {
+            endDate = endDate + ' ' + request.query.endTime + '+03'
+          }
+          queryString += 'time < ' + "'" + endDate + "'"
+        }
+      } else if (request.query.endDate) {
+        if (request.query.endDate) {
+          endDate = request.query.endDate
+          if (request.query.endTime) {
+            endDate = endDate + ' ' + request.query.endTime + '+03'
+          }
+        }
+        queryString += 'time < ' + endDate
+      }
     }
-    if (request.query.endDate) {
-      endDate = request.query.endDate
-    }
-    let queryString = 'SELECT * FROM ' + process.env.TABLE_NAME + ' ORDER BY time DESC LIMIT ' + perPage + ' WHERE time > ' + startDate + ' AND time < ' + endDate
+    queryString += ' ORDER BY time DESC LIMIT ' + perPage
+    console.log(queryString)
     if (request.query.page) {
       queryString = queryString + ' OFFSET ' + (perPage * request.query.page + 1)
     }
@@ -66,13 +88,37 @@ app.get('/light-level-hist', function (request, response) {
 
 app.get('/light-level-hist/all', function (request, response) {
   console.log(request.query)
-  db.many('SELECT * FROM ' + process.env.TABLE_NAME + ' ORDER BY time DESC')
-    .then(function (res) {
-      response.send(res)
-    })
-    .catch(function (error) {
-      console.log(error)
-    })
+  if (!request.query.startDate && !request.query.endDate) {
+    db.many('SELECT * FROM ' + process.env.TABLE_NAME + ' ORDER BY time DESC')
+      .then(function (res) {
+        response.send(res)
+      })
+      .catch(function (error) {
+        console.log(error)
+      })
+  } else {
+    let startDate = '1970-01-01 00:00:00+00'
+    let endDate = moment().format('YYYY-MM-DD HH:mm:ss+00')
+    if (request.query.startDate) {
+      startDate = request.query.startDate
+      if (request.query.startTime) {
+        startDate = startDate + ' ' + startTime + '+00'
+      }
+    }
+    if (request.query.endDate) {
+      endDate = request.query.startDate
+      if (request.query.endTime) {
+        endDate = endDate + ' ' + endTime + '+00'
+      }
+    }
+    db.many('SELECT * FROM ' + process.env.TABLE_NAME + ' ORDER BY time DESC WHERE time < ' + endDate + ' AND time > ' + startDate)
+      .then(function (res) {
+        response.send(res)
+      })
+      .catch(function (error) {
+        console.log(error)
+      })
+  }
 })
 
 app.post('/update-level', function (request, response) {

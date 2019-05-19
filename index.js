@@ -1,3 +1,4 @@
+/* eslint-disable no-template-curly-in-string */
 require('dotenv').config()
 
 const express = require('express')
@@ -52,14 +53,14 @@ app.get('/light-level-hist', function (request, response) {
       if (request.query.startDate) {
         startDate = request.query.startDate
         if (request.query.startTime) {
-          startDate = startDate + ' ' + request.query.startTime + '+03'
+          startDate = startDate + ' ' + request.query.startTime + '+00'
         }
         queryString += 'time > ' + "'" + startDate + "'"
         if (request.query.endDate) {
           queryString += ' AND '
           endDate = request.query.endDate
           if (request.query.endTime) {
-            endDate = endDate + ' ' + request.query.endTime + '+03'
+            endDate = endDate + ' ' + request.query.endTime + '+00'
           }
           queryString += 'time < ' + "'" + endDate + "'"
         }
@@ -67,7 +68,7 @@ app.get('/light-level-hist', function (request, response) {
         if (request.query.endDate) {
           endDate = request.query.endDate
           if (request.query.endTime) {
-            endDate = endDate + ' ' + request.query.endTime + '+03'
+            endDate = endDate + ' ' + request.query.endTime + '+00'
           }
         }
         queryString += 'time < ' + endDate
@@ -102,13 +103,13 @@ app.get('/light-level-hist/all', function (request, response) {
     if (request.query.startDate) {
       startDate = request.query.startDate
       if (request.query.startTime) {
-        startDate = startDate + ' ' + startTime + '+00'
+        startDate = startDate + ' ' + request.query.startTime + '+00'
       }
     }
     if (request.query.endDate) {
       endDate = request.query.startDate
       if (request.query.endTime) {
-        endDate = endDate + ' ' + endTime + '+00'
+        endDate = endDate + ' ' + request.query.endTime + '+00'
       }
     }
     db.many('SELECT * FROM ' + process.env.TABLE_NAME + ' ORDER BY time DESC WHERE time < ' + endDate + ' AND time > ' + startDate)
@@ -121,6 +122,21 @@ app.get('/light-level-hist/all', function (request, response) {
   }
 })
 
+app.post('/save-query', function (request, response) {
+  console.log(request.body.queryString)
+  db.none('INSERT INTO iotapp_savedqueries (query, chart_type) VALUES (${queryString}, ${chartType})', {
+    queryString: request.body.queryString,
+    chartType: request.body.chartType
+  }).then(function (response) {
+    console.log(response)
+  }).catch(function (error) {
+    console.log(error)
+  })
+  response.sendStatus(200)
+})
+app.get('/saved-queries', function (request, response) {
+  db.many('SELECT * FROM iotapp_savedqueries')
+})
 app.post('/update-level', function (request, response) {
   console.log(request.body)
   curLux = request.body.luxlevel

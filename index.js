@@ -150,7 +150,8 @@ app.post('/save-query', function (request, response) {
   response.sendStatus(200)
 })
 app.get('/saved-queries', function (request, response) {
-  db.many('SELECT * FROM iotapp_savedqueries').then(function (response) {
+  db.many('SELECT * FROM iotapp_savedqueries ORDER BY id DESC LIMIT 5').then(function (res) {
+    response.send(res)
   })
 })
 app.post('/update-level', function (request, response) {

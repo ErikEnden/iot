@@ -100,25 +100,40 @@ app.get('/light-level-hist/all', function (request, response) {
   } else {
     let startDate = '1970-01-01 00:00:00+00'
     let endDate = moment().format('YYYY-MM-DD HH:mm:ss+00')
-    if (request.query.startDate) {
-      startDate = request.query.startDate
-      if (request.query.startTime) {
-        startDate = startDate + ' ' + request.query.startTime + '+00'
+    let queryString = 'SELECT * FROM ' + process.env.TABLE_NAME
+    if (request.query.startDate || request.query.endDate) {
+      queryString += ' WHERE '
+      if (request.query.startDate) {
+        startDate = request.query.startDate
+        if (request.query.startTime) {
+          startDate = startDate + ' ' + request.query.startTime + '+00'
+        }
+        queryString += 'time > ' + "'" + startDate + "'"
+        if (request.query.endDate) {
+          queryString += ' AND '
+          endDate = request.query.endDate
+          if (request.query.endTime) {
+            endDate = endDate + ' ' + request.query.endTime + '+00'
+          }
+          queryString += 'time < ' + "'" + endDate + "'"
+        }
+      } else if (request.query.endDate) {
+        if (request.query.endDate) {
+          endDate = request.query.endDate
+          if (request.query.endTime) {
+            endDate = endDate + ' ' + request.query.endTime + '+00'
+          }
+        }
+        queryString += "time < '" + endDate + "'"
       }
     }
-    if (request.query.endDate) {
-      endDate = request.query.startDate
-      if (request.query.endTime) {
-        endDate = endDate + ' ' + request.query.endTime + '+00'
-      }
-    }
-    db.many('SELECT * FROM ' + process.env.TABLE_NAME + ' ORDER BY time DESC WHERE time < ' + endDate + ' AND time > ' + startDate)
-      .then(function (res) {
-        response.send(res)
-      })
-      .catch(function (error) {
-        console.log(error)
-      })
+    queryString += ' ORDER BY time DESC'
+    console.log(queryString)
+    db.many(queryString).then(function (res) {
+      response.send(res)
+    }).catch(function (error) {
+      console.log(error)
+    })
   }
 })
 

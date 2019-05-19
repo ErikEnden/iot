@@ -123,10 +123,10 @@ app.get('/light-level-hist/all', function (request, response) {
 })
 
 app.post('/save-query', function (request, response) {
-  console.log(request.body.queryString)
+  console.log(request.query)
   db.none('INSERT INTO iotapp_savedqueries (query, chart_type) VALUES (${queryString}, ${chartType})', {
-    queryString: request.body.queryString,
-    chartType: request.body.chartType
+    queryString: request.query.queryString,
+    chartType: request.query.chartType
   }).then(function (response) {
     console.log(response)
   }).catch(function (error) {
@@ -135,7 +135,8 @@ app.post('/save-query', function (request, response) {
   response.sendStatus(200)
 })
 app.get('/saved-queries', function (request, response) {
-  db.many('SELECT * FROM iotapp_savedqueries')
+  db.many('SELECT * FROM iotapp_savedqueries').then(function (response) {
+  })
 })
 app.post('/update-level', function (request, response) {
   console.log(request.body)

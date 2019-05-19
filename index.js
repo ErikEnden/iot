@@ -4,6 +4,7 @@ const express = require('express')
 const cors = require('cors')
 const bodyParser = require('body-parser')
 const pgp = require('pg-promise')()
+const moment = require('moment')
 const app = express()
 const port = 3000
 
@@ -30,7 +31,7 @@ app.get('/light-level', function (request, response) {
 })
 
 app.get('/light-level-hist', function (request, response) {
-  if (!request.query.page && !request.query.perPage) {
+  if (!request.query.page && !request.query.perPage && !request.query.startDate && !request.query.endDate) {
     db.many('SELECT * FROM ' + process.env.TABLE_NAME + ' ORDER BY time DESC LIMIT 303')
       .then(function (res) {
         response.send(res)
@@ -40,10 +41,18 @@ app.get('/light-level-hist', function (request, response) {
       })
   } else {
     let perPage = 303
+    let startDate = '1970-01-01 00:00:00+00'
+    let endDate = moment().format('YYYY-MM-DD HH:mm:ss+00')
     if (request.query.perPage) {
       perPage = request.query.perPage
     }
-    let queryString = 'SELECT * FROM ' + process.env.TABLE_NAME + ' ORDER BY time DESC LIMIT ' + perPage
+    if (request.query.startDate) {
+      startDate = request.query.startDate
+    }
+    if (request.query.endDate) {
+      endDate = request.query.endDate
+    }
+    let queryString = 'SELECT * FROM ' + process.env.TABLE_NAME + ' ORDER BY time DESC LIMIT ' + perPage + ' WHERE time > ' + startDate + ' AND time < ' + endDate
     if (request.query.page) {
       queryString = queryString + ' OFFSET ' + (perPage * request.query.page + 1)
     }

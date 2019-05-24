@@ -139,9 +139,10 @@ app.get('/light-level-hist/all', function (request, response) {
 
 app.post('/save-query', function (request, response) {
   console.log(request.query)
-  db.none('INSERT INTO iotapp_savedqueries (query, chart_type) VALUES (${queryString}, ${chartType})', {
+  db.none('INSERT INTO iotapp_savedqueries (query, chart_type, comment) VALUES (${queryString}, ${chartType}, ${comment})', {
     queryString: request.query.queryString,
-    chartType: request.query.chartType
+    chartType: request.query.chartType,
+    comment: request.query.comment
   }).then(function (response) {
     console.log(response)
   }).catch(function (error) {
